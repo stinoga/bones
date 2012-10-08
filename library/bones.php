@@ -78,22 +78,11 @@ function bones_head_cleanup() {
 	remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0 );
 	// WP version
 	remove_action( 'wp_head', 'wp_generator' );
-  // remove WP version from css
-  add_filter( 'style_loader_src', 'bones_remove_wp_ver_css_js', 9999 );
-  // remove Wp version from scripts
-  add_filter( 'script_loader_src', 'bones_remove_wp_ver_css_js', 9999 );
 
 } /* end bones head cleanup */
 
 // remove WP version from RSS
 function bones_rss_version() { return ''; }
-
-// remove WP version from scripts
-function bones_remove_wp_ver_css_js( $src ) {
-    if ( strpos( $src, 'ver=' ) )
-        $src = remove_query_arg( 'ver', $src );
-    return $src;
-}
 
 // remove injected CSS for recent comments widget
 function bones_remove_wp_widget_recent_comments_style() {
@@ -117,7 +106,7 @@ function bones_gallery_style($css) {
 
 
 /*********************
-SCRIPTS & ENQUEUEING
+SCRIPTS & ENQEUEING
 *********************/
 
 // loading modernizr and jquery, and reply script
@@ -138,20 +127,26 @@ function bones_scripts_and_styles() {
       wp_enqueue_script( 'comment-reply' );
     }
 
-    //adding scripts file in the footer
-    wp_register_script( 'bones-js', get_stylesheet_directory_uri() . '/library/js/scripts.js', array( 'jquery' ), '', true );
+    //adding scripts file and jquery in the footer
+    // Remove the default jQuery script
+    wp_deregister_script('jquery');
+    // Register the google hosted version
+    wp_register_script( 'jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js', '', '', true );
+    wp_register_script( 'bones-js', get_stylesheet_directory_uri() . '/library/js/scripts-ck.js', array( 'jquery' ), '', true );
 
     // enqueue styles and scripts
     wp_enqueue_script( 'bones-modernizr' );
     wp_enqueue_style( 'bones-stylesheet' );
     wp_enqueue_style('bones-ie-only');
     /*
-    I recommend using a plugin to call jQuery
+    I reccomend using a plugin to call jQuery
     using the google cdn. That way it stays cached
     and your site will load faster.
     */
     wp_enqueue_script( 'jquery' );
     wp_enqueue_script( 'bones-js' );
+
+
 
   }
 }
@@ -160,7 +155,7 @@ function bones_scripts_and_styles() {
 // source: http://code.garyjones.co.uk/ie-conditional-style-sheets-wordpress/
 function bones_ie_conditional( $tag, $handle ) {
 	if ( 'bones-ie-only' == $handle )
-		$tag = '<!--[if lt IE 9]>' . "\n" . $tag . '<![endif]-->' . "\n";
+		$tag = '<!--[if lte IE 9]>' . "\n" . $tag . '<![endif]-->' . "\n";
 	return $tag;
 }
 
@@ -231,7 +226,7 @@ function bones_main_nav() {
     wp_nav_menu(array(
     	'container' => false,                           // remove nav container
     	'container_class' => 'menu clearfix',           // class of container (should you choose to use it)
-    	'menu' => 'The Main Menu',                      // nav name
+    	'menu' => 'The Main Menu',                           // nav name
     	'menu_class' => 'nav top-nav clearfix',         // adding custom nav class
     	'theme_location' => 'main-nav',                 // where it's located in the theme
     	'before' => '',                                 // before the menu
@@ -290,10 +285,10 @@ function bones_related_posts() {
         $related_posts = get_posts($args);
         if($related_posts) {
         	foreach ($related_posts as $post) : setup_postdata($post); ?>
-	           	<li class="related_post"><a class="entry-unrelated" href="<?php the_permalink() ?>" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></li>
+	           	<li class="related_post"><a href="<?php the_permalink() ?>" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></li>
 	        <?php endforeach; }
 	    else { ?>
-            <?php echo '<li class="no_related_post">No Related Posts Yet!</li>'; ?>
+            <li class="no_related_post">No Related Posts Yet!</li>
 		<?php }
 	}
 	wp_reset_query();

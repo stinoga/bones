@@ -14,7 +14,7 @@
 						
 							</header> <!-- end article header -->
 					
-							<section class="entry-content">
+							<section class="post-content">
 							
 								<p><?php _e("The article you were looking for was not found, but maybe try looking again!", "bonestheme"); ?></p>
 					

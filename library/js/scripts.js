@@ -15,16 +15,18 @@ if (!window.getComputedStyle) {
         this.el = el;
         this.getPropertyValue = function(prop) {
             var re = /(\-([a-z]){1})/g;
-            if (prop == 'float') prop = 'styleFloat';
+            if (prop === 'float') {
+                prop = 'styleFloat';
+            }
             if (re.test(prop)) {
                 prop = prop.replace(re, function () {
                     return arguments[2].toUpperCase();
                 });
             }
             return el.currentStyle[prop] ? el.currentStyle[prop] : null;
-        }
+        };
         return this;
-    }
+    };
 }
 
 // as the page loads, call these scripts
@@ -33,42 +35,42 @@ jQuery(document).ready(function($) {
     /*
     Responsive jQuery is a tricky thing.
     There's a bunch of different ways to handle
-    it, so be sure to research and find the one
+    it so, be sure to research and find the one
     that works for you best.
     */
-    
+
     /* getting viewport width */
     var responsive_viewport = $(window).width();
-    
+
     /* if is below 481px */
     if (responsive_viewport < 481) {
-    
+
     } /* end smallest screen */
-    
+
     /* if is larger than 481px */
     if (responsive_viewport > 481) {
-        
+
     } /* end larger than 481px */
-    
+
     /* if is above or equal to 768px */
     if (responsive_viewport >= 768) {
-    
+
         /* load gravatars */
         $('.comment img[data-gravatar]').each(function(){
             $(this).attr('src',$(this).attr('data-gravatar'));
         });
-        
+
     }
-    
+
     /* off the bat large screen actions */
     if (responsive_viewport > 1030) {
-        
+
     }
-    
-	
+
+
 	// add all your scripts here
-	
- 
+
+
 }); /* end of as page load scripts */
 
 
@@ -106,3 +108,53 @@ jQuery(document).ready(function($) {
 	w.addEventListener( "orientationchange", restoreZoom, false );
 	w.addEventListener( "devicemotion", checkTilt, false );
 })( this );
+
+// Smoothe Scrolling with Jquery: http://css-tricks.com/snippets/jquery/smooth-scrolling/
+$(document).ready(function() {
+    function filterPath(string) {
+    return string
+        .replace(/^\//,'')
+        .replace(/(index|default).[a-zA-Z]{3,4}$/,'')
+        .replace(/\/$/,'');
+    }
+    var locationPath = filterPath(location.pathname);
+    var scrollElem = scrollableElement('html', 'body');
+
+    $('a[href*=#]').each(function() {
+        var thisPath = filterPath(this.pathname) || locationPath;
+        if (  locationPath === thisPath
+        && (location.hostname === this.hostname || !this.hostname)
+        && this.hash.replace(/#/,'') ) {
+            var $target = $(this.hash), target = this.hash;
+            if (target) {
+                var targetOffset = $target.offset().top;
+                $(this).click(function(event) {
+                    event.preventDefault();
+                    $(scrollElem).animate({scrollTop: targetOffset}, 400, function() {
+                        location.hash = target;
+                    });
+                });
+            }
+        }
+    });
+
+    // use the first element that is "scrollable"
+    function scrollableElement(els) {
+        for (var i = 0, argLength = arguments.length; i <argLength; i++) {
+            var el = arguments[i],
+                    $scrollElement = $(el);
+            if ($scrollElement.scrollTop()> 0) {
+                return el;
+            } else {
+                $scrollElement.scrollTop(1);
+                var isScrollable = $scrollElement.scrollTop()> 0;
+                $scrollElement.scrollTop(0);
+                if (isScrollable) {
+                    return el;
+                }
+            }
+        }
+        return [];
+    }
+
+});
